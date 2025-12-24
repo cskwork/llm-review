@@ -14,11 +14,12 @@ else
   MODEL=$(jq -r '.models.reviewer.model' pipeline.config.json)
 fi
 
-codex exec resume --last \
+codex exec \
   --full-auto \
   --model "$MODEL" \
   --output-schema docs/schemas/review-result.schema.json \
   -o .task/review-result.json \
+  resume --last \
   "Review the implementation in .task/impl-result.json.
    Check against docs/standards.md.
    Identify bugs, security issues, code style violations.

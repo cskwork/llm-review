@@ -68,11 +68,12 @@ Decision rules:
 
 # Execute Codex with schema enforcement
 # resume --last: carry forward context from previous sessions
-codex exec resume --last \
+codex exec \
   --full-auto \
   --model "$MODEL" \
   --output-schema docs/schemas/plan-review.schema.json \
   -o .task/plan-review.json \
+  resume --last \
   "$PROMPT"
 
 # Verify output file was created and is valid JSON
