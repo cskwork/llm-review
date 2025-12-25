@@ -2,10 +2,10 @@
 
 ## Architecture Overview
 
-This pipeline uses a **subagent-based architecture**:
+This pipeline uses a **main-thread-first architecture**:
 
-- **Main Claude Code thread** = Orchestrator only (coordinates work)
-- **Subagents** = Do the actual work (planning, coding, reviewing)
+- **Main Claude Code thread** = Does planning, research, and implementation directly
+- **Reviewer Subagents** = Internal reviews only (parallel, isolated)
 - **Codex** = Final review checkpoints only (end of planning, end of implementation)
 
 ### Subagents
@@ -14,11 +14,10 @@ Located in `.claude/agents/`:
 
 | Subagent | Purpose | Model |
 |----------|---------|-------|
-| `planner` | Drafts and refines plans | opus |
-| `implementer` | Writes code | opus |
-| `researcher` | Codebase exploration | opus |
 | `reviewer-sonnet` | Fast review (code + security + tests) | sonnet |
 | `reviewer-opus` | Deep review (code + security + tests) | opus |
+
+> **Why only reviewers?** Planning, research, and implementation run in the main thread to preserve full context. Only reviewers run as subagents to keep review feedback isolated and enable parallel execution.
 
 > **Dual Review Model**: Internal reviewers run in parallel with both sonnet and opus to get different perspectives. Both must approve before proceeding.
 
@@ -38,9 +37,9 @@ Located in `.claude/agents/`:
 
 ```
 plan_drafting
-     ↓ (planner subagent creates initial plan)
+     ↓ (main thread creates initial plan)
 plan_refining
-     ↓ (planner + researcher subagents refine)
+     ↓ (main thread researches and refines)
      ↓ (reviewer-sonnet + reviewer-opus internal review)
      ↓ [loop until internally approved]
 plan_reviewing
@@ -49,18 +48,17 @@ plan_reviewing
      ↓ [needs_changes] → back to plan_refining
 ```
 
-**Subagent Flow:**
-1. `planner` → Creates initial plan from user request
-2. `researcher` → Gathers codebase context
-3. `planner` → Refines plan with technical details
-4. `reviewer-sonnet` + `reviewer-opus` → Internal review (loops until solid)
-5. **Codex** → Final plan review (only Codex call in planning phase)
+**Flow:**
+1. Main thread → Creates initial plan from user request
+2. Main thread → Researches codebase and refines plan with technical details
+3. `reviewer-sonnet` + `reviewer-opus` → Internal review (loops until solid)
+4. **Codex** → Final plan review (only Codex call in planning phase)
 
 ### Phase 2: Implementation
 
 ```
 implementing
-     ↓ (implementer subagent writes code)
+     ↓ (main thread writes code)
      ↓ (reviewer-sonnet + reviewer-opus internal reviews)
      ↓ [loop until internally approved]
 reviewing
@@ -69,8 +67,8 @@ reviewing
      ↓ [needs_changes] → fixing → reviewing
 ```
 
-**Subagent Flow:**
-1. `implementer` → Writes code following standards
+**Flow:**
+1. Main thread → Writes code following standards
 2. `reviewer-sonnet` + `reviewer-opus` → Internal review (code + security + tests)
 3. **Codex** → Final code review (only Codex call in implementation phase)
 
@@ -88,7 +86,7 @@ Example output:
 ```
 [INFO] Current state: plan_drafting
 
-ACTION: Invoke 'planner' subagent
+ACTION: Create initial plan (main thread)
 
 Task: Create initial plan from user request
 Input: .task/user-request.txt
@@ -131,15 +129,15 @@ After completion, transition state:
 ```
 idle
   ↓
-plan_drafting (planner subagent)
+plan_drafting (main thread creates plan)
   ↓
-plan_refining (planner + researcher + reviewer internal loop)
+plan_refining (main thread refines + reviewer internal loop)
   ↓
 plan_reviewing (Codex final review) ←──────────────────┐
   ↓                                                    │
   [needs_changes] → back to plan_refining ─────────────┘
   ↓ [approved]
-implementing (implementer + internal reviewers loop)
+implementing (main thread implements + reviewer internal loop)
   ↓
 reviewing (Codex final review) ←───────────────────────┐
   ↓                                                    │
@@ -153,7 +151,7 @@ complete
 | From | To | Trigger |
 |------|----|---------|
 | `idle` | `plan_drafting` | User sets state with user-request.txt |
-| `plan_drafting` | `plan_refining` | Planner creates initial plan |
+| `plan_drafting` | `plan_refining` | Main thread creates initial plan |
 | `plan_refining` | `plan_reviewing` | Both reviewers approve (sonnet + opus) |
 | `plan_reviewing` | `plan_refining` | Codex requests changes |
 | `plan_reviewing` | `implementing` | Codex approves → Claude Code runs plan-to-task.sh |
@@ -161,9 +159,9 @@ complete
 | `reviewing` | `complete` | Codex approves |
 | `reviewing` | `fixing` | Codex requests changes |
 | `reviewing` | `error` | Codex rejects (fundamentally flawed) |
-| `fixing` | `reviewing` | Implementer fixes issues |
+| `fixing` | `reviewing` | Main thread fixes issues |
 | `*` | `error` | Failure after retries |
-| `*` | `needs_user_input` | Subagent needs clarification |
+| `*` | `needs_user_input` | Main thread needs clarification |
 
 > **Note**: `rejected` status means the task is fundamentally flawed and cannot be fixed with minor changes. Use `./scripts/recover.sh` to restart with a new approach.
 
@@ -179,7 +177,7 @@ complete
   "description": "What the user wants to achieve",
   "requirements": ["req1", "req2"],
   "created_at": "ISO8601",
-  "created_by": "planner"
+  "created_by": "claude"
 }
 ```
 
@@ -196,7 +194,7 @@ complete
   "dependencies": [],
   "estimated_complexity": "low|medium|high",
   "potential_challenges": ["challenge 1"],
-  "refined_by": "planner",
+  "refined_by": "claude",
   "refined_at": "ISO8601"
 }
 ```

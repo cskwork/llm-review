@@ -115,7 +115,7 @@ EOF
   echo "$error_file"
 }
 
-# Note: Old run_* functions removed - subagents now handle execution
+# Note: Old run_* functions removed - main thread handles execution
 # The orchestrator just shows status and next actions
 
 # Dry-run validation mode
@@ -195,11 +195,8 @@ run_dry_run() {
   # 5. Check subagents
   local subagents_dir="$PROJECT_ROOT/.claude/agents"
   local required_agents=(
-    "planner.md"
-    "implementer.md"
     "reviewer-sonnet.md"
     "reviewer-opus.md"
-    "researcher.md"
   )
   local agents_ok=1
   if [[ -d "$subagents_dir" ]]; then
@@ -305,10 +302,10 @@ show_next_action() {
       echo "Pipeline idle. To start:"
       echo "  1. Create .task/user-request.txt with your feature request"
       echo "  2. Run: ./scripts/state-manager.sh set plan_drafting \"\""
-      echo "  3. Invoke the planner subagent to create .task/plan.json"
+      echo "  3. Create .task/plan.json with the initial plan"
       ;;
     plan_drafting)
-      echo "ACTION: Invoke 'planner' subagent"
+      echo "ACTION: Create initial plan (main thread)"
       echo ""
       echo "Task: Create initial plan from user request"
       echo "Input: .task/user-request.txt"
@@ -318,9 +315,9 @@ show_next_action() {
       echo "  ./scripts/state-manager.sh set plan_refining \"\$(jq -r .id .task/plan.json)\""
       ;;
     plan_refining)
-      echo "ACTION: Invoke 'planner' + 'researcher' subagents"
+      echo "ACTION: Refine plan with technical details (main thread)"
       echo ""
-      echo "Task: Refine plan with technical details"
+      echo "Task: Research codebase and refine plan"
       echo "Input: .task/plan.json"
       if [[ -f .task/plan-review.json ]]; then
         echo "Feedback: .task/plan-review.json (address all concerns)"
@@ -345,7 +342,7 @@ show_next_action() {
       echo "  - If needs_changes: ./scripts/state-manager.sh set plan_refining <plan_id>"
       ;;
     implementing)
-      echo "ACTION: Invoke 'implementer' subagent"
+      echo "ACTION: Implement the approved plan (main thread)"
       echo ""
       echo "Task: Implement the approved plan"
       echo "Input: .task/current-task.json"
@@ -377,7 +374,7 @@ show_next_action() {
       echo "    (Task is fundamentally flawed; use ./scripts/recover.sh to restart)"
       ;;
     fixing)
-      echo "ACTION: Invoke 'implementer' subagent to fix issues"
+      echo "ACTION: Fix issues from Codex review (main thread)"
       echo ""
       echo "Task: Fix issues from Codex review"
       echo "Input: .task/current-task.json"

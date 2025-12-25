@@ -1,18 +1,22 @@
 # Claude Code - Multi-AI Pipeline Project
 
-> **IMPORTANT**: This project uses a subagent-based orchestrator workflow. The main Claude Code thread coordinates subagents for planning, implementation, and internal reviews. Codex is called only at key checkpoints.
+> **IMPORTANT**: This project uses an orchestrated workflow where the main Claude Code thread handles planning, research, and implementation directly. Only internal reviewers run as separate subagents. Codex is called at key checkpoints for final reviews.
 
 ## Architecture Overview
 
 ```
-Main Claude Code Thread (Orchestrator)
+Main Claude Code Thread (Does the Work)
   │
-  ├── Subagents (do the work):
-  │     ├── planner         → Drafts and refines plans
-  │     ├── researcher      → Gathers codebase context
-  │     ├── implementer     → Writes code
-  │     ├── reviewer-sonnet → Fast internal review (code + security + tests)
-  │     └── reviewer-opus   → Deep internal review (code + security + tests)
+  ├── Planning & Research (main thread)
+  │     ├── Creates initial plan from user request
+  │     └── Refines plan with technical details
+  │
+  ├── Implementation (main thread)
+  │     └── Writes code following approved plan
+  │
+  ├── Reviewer Subagents (parallel, isolated):
+  │     ├── reviewer-sonnet → Fast review (code + security + tests)
+  │     └── reviewer-opus   → Deep review (code + security + tests)
   │
   └── Codex (final reviews only):
         ├── End of planning phase
@@ -26,7 +30,7 @@ Main Claude Code Thread (Orchestrator)
 Guide users to use the orchestrator workflow:
 
 ```
-This project uses a subagent-based orchestrator (Claude subagents + Codex reviews).
+This project uses an orchestrated workflow (main thread + reviewer subagents + Codex reviews).
 
 To implement your request:
 
@@ -38,11 +42,11 @@ To implement your request:
    ./scripts/orchestrator.sh
 
 The pipeline will:
-- Create and refine a plan (planner + researcher subagents)
-- Run internal reviews (reviewer-sonnet + reviewer-opus)
+- Create and refine a plan (main thread)
+- Run internal reviews (reviewer-sonnet + reviewer-opus subagents)
 - Final plan review (Codex)
-- Implement the code (implementer subagent)
-- Run internal reviews (reviewer-sonnet + reviewer-opus)
+- Implement the code (main thread)
+- Run internal reviews (reviewer-sonnet + reviewer-opus subagents)
 - Final code review (Codex)
 
 For status: ./scripts/orchestrator.sh status
@@ -59,7 +63,7 @@ The orchestrator displays the current state and what action to take:
 $ ./scripts/orchestrator.sh
 [INFO] Current state: plan_drafting
 
-ACTION: Invoke 'planner' subagent
+ACTION: Create initial plan (main thread)
 
 Task: Create initial plan from user request
 Input: .task/user-request.txt
@@ -71,9 +75,9 @@ After completion, transition state:
 
 ### Workflow Steps
 
-1. **Read the ACTION** - See which subagent to invoke
-2. **Invoke the subagent** - Use Task tool with the specified agent
-3. **Write output file** - Subagent writes to the specified output location
+1. **Read the ACTION** - See what work needs to be done
+2. **Do the work** - Main thread handles planning/implementation; use Task tool for reviewers
+3. **Write output file** - Write to the specified output location
 4. **Transition state** - Run the shown state-manager command
 5. **Run orchestrator again** - See the next action
 
@@ -85,21 +89,20 @@ Located in `.claude/agents/`:
 
 | Subagent | Purpose | Model |
 |----------|---------|-------|
-| `planner` | Drafts and refines plans | opus |
-| `researcher` | Gathers codebase context | opus |
-| `implementer` | Writes code | opus |
 | `reviewer-sonnet` | Fast review (code + security + tests) | sonnet |
 | `reviewer-opus` | Deep review (code + security + tests) | opus |
 
+> **Why only reviewers?** Planning, research, and implementation run in the main thread to preserve full context. Only reviewers run as subagents to keep review feedback isolated and enable parallel execution.
+
 > **Dual Review Model**: Internal reviewers run in parallel with both sonnet and opus models to get different perspectives. Both must approve before proceeding to Codex.
 
-### Invoking Subagents
+### Invoking Reviewer Subagents
 
-Use the Task tool to invoke subagents:
+Use the Task tool to invoke reviewers:
 
 ```
-Task: planner
-Prompt: "Create an initial plan for the user request in .task/user-request.txt. Output to .task/plan.json"
+Task: reviewer-sonnet
+Prompt: "Review the implementation in .task/impl-result.json. Output to .task/internal-review-sonnet.json"
 ```
 
 ---
@@ -109,15 +112,15 @@ Prompt: "Create an initial plan for the user request in .task/user-request.txt. 
 ```
 idle
   ↓
-plan_drafting (planner subagent)
+plan_drafting (main thread creates plan)
   ↓
-plan_refining (planner + researcher + reviewer internal loop)
+plan_refining (main thread refines + reviewer subagents)
   ↓
 plan_reviewing (Codex final review) ←──────────────────┐
   ↓                                                    │
   [needs_changes] → back to plan_refining ─────────────┘
   ↓ [approved]
-implementing (implementer + internal reviewers loop)
+implementing (main thread implements + reviewer subagents)
   ↓
 reviewing (Codex final review) ←───────────────────────┐
   ↓                                                    │
@@ -148,7 +151,7 @@ Write to: `.task/plan.json`
   "description": "What the user wants to achieve",
   "requirements": ["req1", "req2"],
   "created_at": "ISO8601",
-  "created_by": "planner"
+  "created_by": "claude"
 }
 ```
 
@@ -170,7 +173,7 @@ Write to: `.task/plan-refined.json`
     "Challenge 1 and how to address it",
     "Challenge 2 and how to address it"
   ],
-  "refined_by": "planner",
+  "refined_by": "claude",
   "refined_at": "ISO8601"
 }
 ```
