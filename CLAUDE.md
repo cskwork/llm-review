@@ -11,8 +11,8 @@ Main Claude Code Thread (Does the Work)
   │     ├── Creates initial plan from user request
   │     └── Refines plan with technical details
   │
-  ├── Implementation (main thread)
-  │     └── Writes code following approved plan
+  ├── Implementation Skill:
+  │     └── /implement-sonnet → Writes code (sonnet model, main context)
   │
   └── Review Skills (sequential, forked context):
         ├── /review-sonnet → Fast review (sonnet model)
@@ -41,7 +41,7 @@ To implement your request:
 The pipeline will:
 - Create and refine a plan (main thread)
 - Sequential reviews: /review-sonnet → /review-opus → /review-codex
-- Implement the code (main thread)
+- Implement the code (/implement-sonnet)
 - Sequential reviews: /review-sonnet → /review-opus → /review-codex
 
 For status: ./scripts/orchestrator.sh status
@@ -50,14 +50,15 @@ For recovery: ./scripts/recover.sh
 
 ---
 
-## Review Skills
+## Skills
 
 Located in `.claude/skills/`:
 
 | Skill | Purpose | Model |
 |-------|---------|-------|
-| `/review-sonnet` | Fast review (code + security + tests) | sonnet |
-| `/review-opus` | Deep review (architecture + subtle issues) | opus |
+| `/implement-sonnet` | Code implementation (main context) | sonnet |
+| `/review-sonnet` | Fast review (forked context) | sonnet |
+| `/review-opus` | Deep review (forked context) | opus |
 | `/review-codex` | Final review via Codex CLI | codex |
 
 ### Sequential Review Flow
@@ -110,7 +111,7 @@ plan_refining (main thread refines + sequential skill reviews)
   │  If codex needs_changes: restart from sonnet
   │
   ↓ [all approved]
-implementing (main thread implements + sequential skill reviews)
+implementing (/implement-sonnet + sequential skill reviews)
   │
   │  Review cycle: sonnet → opus → codex
   │  If codex needs_changes: restart from sonnet

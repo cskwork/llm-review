@@ -188,9 +188,10 @@ run_dry_run() {
   done
   [[ $scripts_ok -eq 1 ]] && echo "Scripts: OK (${#required_scripts[@]} scripts)"
 
-  # 5. Check review skills
+  # 5. Check skills
   local skills_dir="$PROJECT_ROOT/.claude/skills"
   local required_skills=(
+    "implement-sonnet/SKILL.md"
     "review-sonnet/SKILL.md"
     "review-opus/SKILL.md"
     "review-codex/SKILL.md"
@@ -345,9 +346,10 @@ show_next_action() {
       echo "  ./scripts/state-manager.sh set plan_refining \"\$(jq -r .id .task/plan-refined.json)\""
       ;;
     implementing)
-      echo "ACTION: Implement the approved plan (main thread)"
+      echo "ACTION: Invoke /implement-sonnet to implement the approved plan"
       echo ""
       echo "Task: Implement the approved plan"
+      echo "Skill: /implement-sonnet"
       echo "Input: .task/plan-refined.json"
       echo "Standards: docs/standards.md"
       if [[ -f .task/review-codex.json ]]; then

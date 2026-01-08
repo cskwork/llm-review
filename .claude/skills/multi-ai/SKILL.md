@@ -70,10 +70,12 @@ When all approve, continue.
 
 ## Step 8: Implement
 
-Create `.task/impl-result.json`:
+**Invoke /implement-sonnet** to implement the approved plan.
+
+This skill will:
 - Write the code following the approved plan
 - Add tests
-- Document `files_changed` and `tests_added`
+- Output to `.task/impl-result.json`
 
 ## Step 9: Sequential Code Reviews
 

@@ -71,7 +71,7 @@ implementing
 
 ```
 implementing
-     ↓ (main thread writes code)
+     ↓ (/implement-sonnet writes code)
      ↓ Sequential reviews:
      │   1. /review-sonnet → fix issues
      │   2. /review-opus → fix issues
@@ -81,7 +81,7 @@ complete
 ```
 
 **Flow:**
-1. Main thread → Writes code following standards
+1. **Invoke /implement-sonnet** → Writes code following standards
 2. **Sequential Reviews**:
    - `/review-sonnet` → Code quality + security + tests
    - `/review-opus` → Architecture + subtle bugs + test quality
@@ -140,7 +140,7 @@ When all reviews pass:
 | `idle` | No active task |
 | `plan_drafting` | Creating initial plan |
 | `plan_refining` | Refining plan + sequential skill reviews |
-| `implementing` | Writing code + sequential skill reviews |
+| `implementing` | /implement-sonnet + sequential skill reviews |
 | `complete` | Task finished |
 | `error` | Pipeline error |
 | `needs_user_input` | Waiting for user clarification |
@@ -158,7 +158,7 @@ plan_refining (main thread refines + sequential skill reviews)
   │   sonnet → fix → opus → fix → codex
   │          ↑__________________________|  (restart if codex finds issues)
   ↓ [all approved]
-implementing (main thread implements + sequential skill reviews)
+implementing (/implement-sonnet + sequential skill reviews)
   │   sonnet → fix → opus → fix → codex
   │          ↑__________________________|  (restart if codex finds issues)
   ↓ [all approved]

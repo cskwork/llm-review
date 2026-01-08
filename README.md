@@ -13,7 +13,8 @@ A development pipeline that orchestrates multiple AI models to plan, implement, 
 
 ## Architecture
 
-- **Claude Code (Main Thread)** - Does planning, research, and implementation directly
+- **Claude Code (Main Thread)** - Does planning and research directly
+- **Implementation Skill** - `/implement-sonnet` for token-efficient code implementation
 - **Review Skills** - Three skills for sequential review (sonnet → opus → codex)
 - **Codex CLI** - Invoked by review-codex skill for final reviews
 
@@ -67,7 +68,7 @@ User Request → Main Thread (creates & refines plan)
 ### Phase 2: Implementation
 
 ```
-Plan → Main Thread (implements code)
+Plan → /implement-sonnet (implements code)
                     ↓
        /review-sonnet (fast review)
                     ↓
@@ -156,7 +157,8 @@ your-project/
 ├── CLAUDE.md                 # Claude orchestrator instructions
 ├── AGENTS.md                 # Codex reviewer instructions
 ├── .claude/
-│   └── skills/               # Review and orchestration skills
+│   └── skills/               # Implementation and review skills
+│       ├── implement-sonnet/ # Code implementation (sonnet model)
 │       ├── review-sonnet/    # Fast review (sonnet model)
 │       ├── review-opus/      # Deep review (opus model)
 │       ├── review-codex/     # Final review (codex)
@@ -187,6 +189,7 @@ your-project/
 
 | Skill | Model | Purpose |
 |-------|-------|---------|
+| `/implement-sonnet` | sonnet | Code implementation with main context |
 | `/review-sonnet` | sonnet | Fast review (code + security + tests) |
 | `/review-opus` | opus | Deep review (architecture + subtle issues) |
 | `/review-codex` | codex | Final review via Codex CLI |
@@ -210,7 +213,7 @@ your-project/
 - `.task/` directory and state file validity
 - `pipeline.config.json` valid JSON syntax
 - Required scripts present and executable (4 scripts)
-- Required skills in `.claude/skills/` (3 review skills)
+- Required skills in `.claude/skills/` (4 skills: implement + 3 review)
 - Required docs (`standards.md`, `workflow.md`)
 - `.task` in `.gitignore`
 - CLI tools (`jq` required, `claude`/`codex` optional)
