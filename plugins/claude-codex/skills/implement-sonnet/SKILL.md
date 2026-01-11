@@ -2,6 +2,7 @@
 name: implement-sonnet
 description: Implement code using sonnet model with full main context access
 model: claude-sonnet-4-5-20250929
+plugin-scoped: true
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

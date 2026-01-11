@@ -2,6 +2,7 @@
 name: review-sonnet
 description: Fast code/plan review for quality, security, and tests. Use for quick reviews before deeper analysis.
 model: claude-sonnet-4-5-20250929
+plugin-scoped: true
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---

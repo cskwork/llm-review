@@ -1,6 +1,7 @@
 ---
 name: multi-ai
 description: Start the multi-AI pipeline with a given request. Cleans up old task files and guides through plan → review → implement → review workflow.
+plugin-scoped: true
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 

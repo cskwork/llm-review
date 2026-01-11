@@ -52,7 +52,7 @@ For recovery: ./scripts/recover.sh
 
 ## Skills
 
-Located in `.claude/skills/`:
+Located in `skills/` (plugin root level for `/plugin install` support):
 
 | Skill | Purpose | Model |
 |-------|---------|-------|

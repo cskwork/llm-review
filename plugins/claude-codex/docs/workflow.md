@@ -10,7 +10,7 @@ This pipeline uses a **skill-based sequential architecture**:
 
 ### Reviewer Skills
 
-Located in `.claude/skills/`:
+Located in `skills/` (plugin root level):
 
 | Skill | Purpose | Model |
 |-------|---------|-------|

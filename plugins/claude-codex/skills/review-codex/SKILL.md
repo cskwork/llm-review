@@ -1,6 +1,7 @@
 ---
 name: review-codex
 description: Final code/plan review using Codex. Use as the last review step after sonnet and opus.
+plugin-scoped: true
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---

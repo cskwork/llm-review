@@ -189,7 +189,7 @@ run_dry_run() {
   [[ $scripts_ok -eq 1 ]] && echo "Scripts: OK (${#required_scripts[@]} scripts)"
 
   # 5. Check skills
-  local skills_dir="$PROJECT_ROOT/.claude/skills"
+  local skills_dir="$PROJECT_ROOT/skills"
   local required_skills=(
     "implement-sonnet/SKILL.md"
     "review-sonnet/SKILL.md"
@@ -207,7 +207,7 @@ run_dry_run() {
     done
     [[ $skills_ok -eq 1 ]] && echo "Skills: OK (${#required_skills[@]} skills)"
   else
-    echo "Skills directory: MISSING (.claude/skills/)"
+    echo "Skills directory: MISSING (skills/)"
     ((errors++)) || true
   fi
 
