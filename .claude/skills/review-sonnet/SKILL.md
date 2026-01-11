@@ -1,7 +1,7 @@
 ---
 name: review-sonnet
 description: Fast code/plan review for quality, security, and tests. Use for quick reviews before deeper analysis.
-model: sonnet
+model: claude-sonnet-4-5-20250929
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
@@ -82,6 +82,7 @@ Write to `.task/review-sonnet.json`:
 ## After Review
 
 Report back:
+
 1. Review type (plan or code)
 2. Status (approved or needs_changes)
 3. Summary of findings

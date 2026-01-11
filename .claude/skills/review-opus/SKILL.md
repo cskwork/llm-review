@@ -1,7 +1,7 @@
 ---
 name: review-opus
 description: Deep code/plan review for architecture, subtle bugs, and test quality. Use after sonnet review for thorough analysis.
-model: opus
+model: claude-opus-4-5-20251101
 context: fork
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
@@ -90,6 +90,7 @@ Write to `.task/review-opus.json`:
 ## After Review
 
 Report back:
+
 1. Review type (plan or code)
 2. Status (approved or needs_changes)
 3. Key findings (especially subtle issues)

@@ -1,7 +1,7 @@
 ---
 name: implement-sonnet
 description: Implement code using sonnet model with full main context access
-model: sonnet
+model: claude-sonnet-4-5-20250929
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -57,6 +57,7 @@ Write implementation results to `.task/impl-result.json`:
 ## After Implementation
 
 Report back with:
+
 - Summary of what was implemented
 - List of files changed
 - Any tests added
