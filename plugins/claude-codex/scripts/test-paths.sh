@@ -221,6 +221,78 @@ log_test "Per-project config override takes priority"
   rm -rf "$TEST_PROJECT_DIR"
 )
 
+# Test 11: Gitignore prompt shown when .task not in .gitignore
+log_test "Gitignore prompt shown on first init (no .gitignore)"
+(
+  TEST_PROJECT_DIR=$(mktemp -d)
+  export CLAUDE_PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
+  export CLAUDE_PROJECT_DIR="$TEST_PROJECT_DIR"
+
+  source "$SCRIPT_DIR/state-manager.sh"
+  output=$(init_state 2>&1)
+
+  if [[ "$output" == *".task directory not in .gitignore"* ]]; then
+    log_pass "Gitignore prompt shown when missing"
+  else
+    log_fail "Gitignore prompt not shown"
+  fi
+
+  # Cleanup
+  rm -rf "$TEST_PROJECT_DIR"
+)
+
+# Test 12: Gitignore prompt NOT shown when .task is in .gitignore
+log_test "Gitignore prompt skipped when .task in .gitignore"
+(
+  TEST_PROJECT_DIR=$(mktemp -d)
+  export CLAUDE_PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
+  export CLAUDE_PROJECT_DIR="$TEST_PROJECT_DIR"
+
+  # Create .gitignore with .task
+  echo ".task" > "$TEST_PROJECT_DIR/.gitignore"
+
+  source "$SCRIPT_DIR/state-manager.sh"
+  output=$(init_state 2>&1)
+
+  if [[ "$output" != *".task directory not in .gitignore"* ]]; then
+    log_pass "Gitignore prompt skipped (already in .gitignore)"
+  else
+    log_fail "Gitignore prompt shown when it shouldn't"
+  fi
+
+  # Cleanup
+  rm -rf "$TEST_PROJECT_DIR"
+)
+
+# Test 13: Gitignore prompt only shown once (marker file)
+log_test "Gitignore prompt only shown once per project"
+(
+  TEST_PROJECT_DIR=$(mktemp -d)
+  export CLAUDE_PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
+  export CLAUDE_PROJECT_DIR="$TEST_PROJECT_DIR"
+
+  source "$SCRIPT_DIR/state-manager.sh"
+
+  # First init - should show prompt
+  output1=$(init_state 2>&1)
+
+  # Reset state file to trigger init again
+  rm -f "$TEST_PROJECT_DIR/.task/state.json"
+
+  # Second init - should NOT show prompt (marker exists)
+  output2=$(init_state 2>&1)
+
+  if [[ "$output1" == *".task directory not in .gitignore"* ]] && \
+     [[ "$output2" != *".task directory not in .gitignore"* ]]; then
+    log_pass "Prompt shown first time only"
+  else
+    log_fail "Prompt behavior incorrect"
+  fi
+
+  # Cleanup
+  rm -rf "$TEST_PROJECT_DIR"
+)
+
 # Summary
 echo ""
 echo "========================================="

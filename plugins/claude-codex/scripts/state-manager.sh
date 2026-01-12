@@ -15,9 +15,40 @@ fi
 TASK_DIR="${CLAUDE_PROJECT_DIR:-.}/.task"
 STATE_FILE="$TASK_DIR/state.json"
 
+# Check if .task is in .gitignore and prompt user if not (once per project)
+check_gitignore_prompt() {
+  local project_dir="${CLAUDE_PROJECT_DIR:-.}"
+  local gitignore="$project_dir/.gitignore"
+  local prompted_marker="$TASK_DIR/.gitignore-prompted"
+
+  # Skip if we've already prompted
+  [[ -f "$prompted_marker" ]] && return 0
+
+  # Skip if .task is already in .gitignore
+  if [[ -f "$gitignore" ]] && grep -q "\.task" "$gitignore"; then
+    touch "$prompted_marker"
+    return 0
+  fi
+
+  # Show prompt
+  echo ""
+  echo -e "\033[1;33m⚠ .task directory not in .gitignore\033[0m"
+  echo ""
+  echo "The .task/ directory contains pipeline state and should not be committed."
+  echo "Add it to your .gitignore:"
+  echo ""
+  echo -e "  \033[1mecho '.task' >> $gitignore\033[0m"
+  echo ""
+
+  # Mark as prompted so we don't show again
+  touch "$prompted_marker"
+}
+
 # Initialize state if not exists (with full schema)
 init_state() {
+  local first_init=false
   if [[ ! -f "$STATE_FILE" ]]; then
+    first_init=true
     mkdir -p "$TASK_DIR"
     cat > "$STATE_FILE" << 'EOF'
 {
@@ -30,6 +61,11 @@ init_state() {
   "error_retry_count": 0
 }
 EOF
+  fi
+
+  # Check gitignore on first init
+  if [[ "$first_init" == "true" ]]; then
+    check_gitignore_prompt
   fi
 }
 
