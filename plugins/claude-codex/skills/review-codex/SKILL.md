@@ -32,31 +32,31 @@ Check if `.task/.codex-session-active` exists:
 ## For Plan Reviews
 
 1. Read `.task/plan-refined.json`
-2. Read `docs/standards.md` for review criteria
+2. Read `${CLAUDE_PLUGIN_ROOT}/docs/standards.md` for review criteria
 3. Build prompt for Codex
 4. Invoke Codex using Bash:
 
 ```bash
 codex exec \
   --full-auto \
-  --output-schema docs/schemas/plan-review.schema.json \
+  --output-schema "${CLAUDE_PLUGIN_ROOT}/docs/schemas/plan-review.schema.json" \
   -o .task/review-codex.json \
-  "Review the plan in .task/plan-refined.json against docs/standards.md. Check for completeness, feasibility, and potential issues."
+  "Review the plan in .task/plan-refined.json against ${CLAUDE_PLUGIN_ROOT}/docs/standards.md. Check for completeness, feasibility, and potential issues."
 ```
 
 ## For Code Reviews
 
 1. Read `.task/impl-result.json`
-2. Read `docs/standards.md` for review criteria
+2. Read `${CLAUDE_PLUGIN_ROOT}/docs/standards.md` for review criteria
 3. Build prompt for Codex
 4. Invoke Codex using Bash:
 
 ```bash
 codex exec \
   --full-auto \
-  --output-schema docs/schemas/review-result.schema.json \
+  --output-schema "${CLAUDE_PLUGIN_ROOT}/docs/schemas/review-result.schema.json" \
   -o .task/review-codex.json \
-  "Review the implementation in .task/impl-result.json. Check against docs/standards.md. Identify bugs, security issues, code style violations."
+  "Review the implementation in .task/impl-result.json. Check against ${CLAUDE_PLUGIN_ROOT}/docs/standards.md. Identify bugs, security issues, code style violations."
 ```
 
 ## For Subsequent Reviews
@@ -66,7 +66,7 @@ If `.task/.codex-session-active` exists, use resume:
 ```bash
 codex exec \
   --full-auto \
-  --output-schema docs/schemas/review-result.schema.json \
+  --output-schema "${CLAUDE_PLUGIN_ROOT}/docs/schemas/review-result.schema.json" \
   -o .task/review-codex.json \
   resume --last \
   "Re-review the changes. Previous issues should be addressed."
