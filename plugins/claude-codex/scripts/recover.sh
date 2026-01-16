@@ -45,7 +45,7 @@ reset_to_idle() {
   rm -f "$TASK_DIR/plan.json" "$TASK_DIR/plan-refined.json" "$TASK_DIR/plan-review.json"
   rm -f "$TASK_DIR/current-task.json" "$TASK_DIR/user-request.txt"
   rm -f "$TASK_DIR/internal-review-sonnet.json" "$TASK_DIR/internal-review-opus.json"
-  rm -f "$TASK_DIR/review-sonnet.json" "$TASK_DIR/review-opus.json" "$TASK_DIR/review-codex.json"
+  rm -f "$TASK_DIR/review-sonnet.json" "$TASK_DIR/review-codex.json"
   rm -f "$TASK_DIR/.codex-session-active"  # Clear Codex session marker
   echo -e "${GREEN}Pipeline reset to idle${NC}"
 }

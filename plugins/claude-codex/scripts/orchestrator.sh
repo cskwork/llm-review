@@ -190,7 +190,6 @@ run_dry_run() {
   local required_skills=(
     "implement-sonnet/SKILL.md"
     "review-sonnet/SKILL.md"
-    "review-opus/SKILL.md"
     "review-codex/SKILL.md"
   )
   local skills_ok=1
@@ -319,8 +318,6 @@ show_next_action() {
       echo "Input: $TASK_DIR/plan.json"
       if [[ -f "$TASK_DIR/review-codex.json" ]]; then
         echo "Feedback: $TASK_DIR/review-codex.json (address all concerns - restart cycle)"
-      elif [[ -f "$TASK_DIR/review-opus.json" ]]; then
-        echo "Feedback: $TASK_DIR/review-opus.json (address concerns)"
       elif [[ -f "$TASK_DIR/review-sonnet.json" ]]; then
         echo "Feedback: $TASK_DIR/review-sonnet.json (address concerns)"
       fi
@@ -329,9 +326,7 @@ show_next_action() {
       echo "After completion, run SEQUENTIAL reviews (each model reviews once):"
       echo "  1. Invoke /review-sonnet → $TASK_DIR/review-sonnet.json"
       echo "     If needs_changes: fix issues, then continue to step 2"
-      echo "  2. Invoke /review-opus → $TASK_DIR/review-opus.json"
-      echo "     If needs_changes: fix issues, then continue to step 3"
-      echo "  3. Invoke /review-codex → $TASK_DIR/review-codex.json"
+      echo "  2. Invoke /review-codex → $TASK_DIR/review-codex.json"
       echo "     If needs_changes: fix issues, restart from step 1"
       echo "     If approved: transition to implementing"
       echo ""
@@ -354,8 +349,6 @@ show_next_action() {
       echo "Standards: $PLUGIN_ROOT/docs/standards.md"
       if [[ -f "$TASK_DIR/review-codex.json" ]]; then
         echo "Feedback: $TASK_DIR/review-codex.json (address all concerns - restart cycle)"
-      elif [[ -f "$TASK_DIR/review-opus.json" ]]; then
-        echo "Feedback: $TASK_DIR/review-opus.json (address concerns)"
       elif [[ -f "$TASK_DIR/review-sonnet.json" ]]; then
         echo "Feedback: $TASK_DIR/review-sonnet.json (address concerns)"
       fi
@@ -364,9 +357,7 @@ show_next_action() {
       echo "After implementation, run SEQUENTIAL reviews (each model reviews once):"
       echo "  1. Invoke /review-sonnet → $TASK_DIR/review-sonnet.json"
       echo "     If needs_changes: fix issues, then continue to step 2"
-      echo "  2. Invoke /review-opus → $TASK_DIR/review-opus.json"
-      echo "     If needs_changes: fix issues, then continue to step 3"
-      echo "  3. Invoke /review-codex → $TASK_DIR/review-codex.json"
+      echo "  2. Invoke /review-codex → $TASK_DIR/review-codex.json"
       echo "     If needs_changes: fix issues, restart from step 1"
       echo "     If approved: transition to complete"
       echo ""
@@ -384,7 +375,7 @@ show_next_action() {
       echo "NOTE: This state is deprecated. Fixes now happen within implementing."
       echo ""
       echo "The sequential review flow handles fixes inline:"
-      echo "  sonnet → fix → opus → fix → codex → fix (restart from sonnet)"
+      echo "  sonnet → fix → codex → fix (restart from sonnet)"
       echo ""
       echo "To return to implementing:"
       echo "  $PLUGIN_ROOT/scripts/state-manager.sh set implementing \"\$(bun $PLUGIN_ROOT/scripts/json-tool.ts get $TASK_DIR/plan-refined.json .id)\""
@@ -447,7 +438,7 @@ case "${1:-run}" in
     rm -f "$TASK_DIR/plan.json" "$TASK_DIR/plan-refined.json" "$TASK_DIR/plan-review.json"
     rm -f "$TASK_DIR/current-task.json" "$TASK_DIR/user-request.txt"
     rm -f "$TASK_DIR/internal-review-sonnet.json" "$TASK_DIR/internal-review-opus.json"
-    rm -f "$TASK_DIR/review-sonnet.json" "$TASK_DIR/review-opus.json" "$TASK_DIR/review-codex.json"
+    rm -f "$TASK_DIR/review-sonnet.json" "$TASK_DIR/review-codex.json"
     rm -f "$TASK_DIR/.codex-session-active"  # Clear Codex session marker
     log_success "Pipeline reset to idle"
     ;;

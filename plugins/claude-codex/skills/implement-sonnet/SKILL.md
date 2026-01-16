@@ -22,7 +22,6 @@ You are implementing code as part of the multi-AI pipeline, using the sonnet mod
 2. Read `docs/standards.md` for coding standards
 3. If there's previous review feedback, read the relevant review file:
    - `.task/review-sonnet.json`
-   - `.task/review-opus.json`
    - `.task/review-codex.json`
 
 ## Implementation Process

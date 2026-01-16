@@ -66,8 +66,7 @@ Create `.task/plan-refined.json` with technical details:
 Run reviews in order. Fix issues after each before continuing:
 
 1. **Invoke /review-sonnet** → If issues, fix them
-2. **Invoke /review-opus** → If issues, fix them
-3. **Invoke /review-codex** → If issues, fix and restart from step 1
+2. **Invoke /review-codex** → If issues, fix and restart from step 1
 
 When all approve, continue.
 
@@ -85,8 +84,7 @@ This skill will:
 Run reviews in order. Fix issues after each before continuing:
 
 1. **Invoke /review-sonnet** → If issues, fix them
-2. **Invoke /review-opus** → If issues, fix them
-3. **Invoke /review-codex** → If issues, fix and restart from step 1
+2. **Invoke /review-codex** → If issues, fix and restart from step 1
 
 When all approve, continue.
 

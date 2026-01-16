@@ -4,7 +4,7 @@ A Claude Code plugin marketplace providing multi-AI orchestration tools for plan
 
 **Supported Platforms:** Windows, macOS, Linux
 
-> **New to Claude Codex?** Check out our [comprehensive Wiki](https://github.com/Z-M-Huang/claude-codex/wiki) for beginner-friendly guides and tutorials.
+> **New to Claude Codex?** Check out our [comprehensive Wiki](https://github.com/cskwork/claude-codex/wiki) for beginner-friendly guides and tutorials.
 
 ## Why Multi-AI Review?
 
@@ -12,26 +12,25 @@ A Claude Code plugin marketplace providing multi-AI orchestration tools for plan
 
 In professional software development, code reviews are mandatory. Google requires review for every change. Microsoft uses multiple review stages. Claude Codex brings this professional standard to AI-assisted development.
 
-Instead of trusting a single AI's output, your code goes through **three independent reviews**:
+Instead of trusting a single AI's output, your code goes through **two independent reviews**:
 
 | Reviewer | What It Catches |
 |----------|-----------------|
 | **Claude Sonnet** | Obvious bugs, security basics, code style |
-| **Claude Opus** | Architectural issues, subtle bugs, edge cases |
 | **Codex** | Fresh perspective from a different AI |
 
 **The result:** More bugs caught, better security, and production-ready code.
 
-Each reviewer checks for OWASP Top 10 vulnerabilities, proper error handling, and code quality. If Sonnet misses something, Opus or Codex will likely catch it. The loop-until-approved model means code doesn't proceed until all three reviewers give the green light.
+Each reviewer checks for OWASP Top 10 vulnerabilities, proper error handling, and code quality. If Sonnet misses something, Codex will likely catch it. The loop-until-approved model means code doesn't proceed until both reviewers give the green light.
 
-Learn more: [Why Claude Codex?](https://github.com/Z-M-Huang/claude-codex/wiki/Why-Claude-Codex)
+Learn more: [Why Claude Codex?](https://github.com/cskwork/claude-codex/wiki/Why-Claude-Codex)
 
 ## Installation
 
 ### Step 1: Add Marketplace
 
 ```bash
-/plugin marketplace add Z-M-Huang/claude-codex
+/plugin marketplace add cskwork/claude-codex
 ```
 
 ### Step 2: Install Plugin
@@ -64,7 +63,6 @@ After installation, use skills with the plugin namespace:
 
 # Or run individual skills
 /claude-codex:review-sonnet
-/claude-codex:review-opus
 /claude-codex:review-codex
 /claude-codex:implement-sonnet
 ```
@@ -73,7 +71,7 @@ After installation, use skills with the plugin namespace:
 
 ### claude-codex
 
-Multi-AI orchestration pipeline with sequential review workflow (sonnet → opus → codex).
+Multi-AI orchestration pipeline with sequential review workflow (sonnet → codex).
 
 **Skills included:**
 
@@ -82,7 +80,6 @@ Multi-AI orchestration pipeline with sequential review workflow (sonnet → opus
 | `multi-ai`         | -                 | Pipeline entry point (starts full workflow) |
 | `implement-sonnet` | Claude Sonnet 4.5 | Code implementation with main context       |
 | `review-sonnet`    | Claude Sonnet 4.5 | Fast review (code + security + tests)       |
-| `review-opus`      | Claude Opus 4.5   | Deep review (architecture + subtle issues)  |
 | `review-codex`     | Codex CLI         | Final review via OpenAI Codex               |
 
 ## Recommended Subscriptions
@@ -104,9 +101,9 @@ This command:
 
 1. Cleans up previous task files
 2. Creates and refines a plan
-3. Runs sequential reviews (sonnet → opus → codex)
+3. Runs sequential reviews (sonnet → codex)
 4. Implements the code
-5. Runs sequential reviews (sonnet → opus → codex)
+5. Runs sequential reviews (sonnet → codex)
 6. Marks complete
 
 ### Sequential Review Flow
@@ -114,13 +111,13 @@ This command:
 Reviews run **sequentially** - each model reviews only ONCE per cycle:
 
 ```
-Plan/Code → review-sonnet → fix → review-opus → fix → review-codex → fix (restart)
+Plan/Code → review-sonnet → fix → review-codex → fix (restart)
 ```
 
 **Key benefits:**
 
 - Each model provides unique perspective without re-reviewing
-- Progressive refinement (fast → deep → final)
+- Progressive refinement (fast → final)
 - Token-efficient (forked context isolation)
 
 ## Marketplace Structure
@@ -137,7 +134,6 @@ claude-codex/
 │       │   ├── multi-ai/
 │       │   ├── implement-sonnet/
 │       │   ├── review-sonnet/
-│       │   ├── review-opus/
 │       │   └── review-codex/
 │       ├── scripts/              # Orchestration scripts
 │       ├── docs/                 # Standards and workflow
@@ -211,7 +207,7 @@ Example plugin.json:
 /plugin marketplace list
 
 # Re-add if needed
-/plugin marketplace add Z-M-Huang/claude-codex
+/plugin marketplace add cskwork/claude-codex
 ```
 
 ### Skills not loading
@@ -233,14 +229,14 @@ Example plugin.json:
 
 ## Documentation
 
-For detailed guides, visit our [Wiki](https://github.com/Z-M-Huang/claude-codex/wiki):
+For detailed guides, visit our [Wiki](https://github.com/cskwork/claude-codex/wiki):
 
-- [Why Claude Codex?](https://github.com/Z-M-Huang/claude-codex/wiki/Why-Claude-Codex) - Benefits of multi-AI review
-- [Getting Started](https://github.com/Z-M-Huang/claude-codex/wiki/Getting-Started) - Step-by-step installation for beginners
-- [Understanding the Pipeline](https://github.com/Z-M-Huang/claude-codex/wiki/Understanding-the-Pipeline) - How the review process works
-- [How to Use](https://github.com/Z-M-Huang/claude-codex/wiki/How-to-Use) - Commands and usage examples
-- [Configuration](https://github.com/Z-M-Huang/claude-codex/wiki/Configuration) - Customization options
-- [Troubleshooting](https://github.com/Z-M-Huang/claude-codex/wiki/Troubleshooting) - Common issues and solutions
+- [Why Claude Codex?](https://github.com/cskwork/claude-codex/wiki/Why-Claude-Codex) - Benefits of multi-AI review
+- [Getting Started](https://github.com/cskwork/claude-codex/wiki/Getting-Started) - Step-by-step installation for beginners
+- [Understanding the Pipeline](https://github.com/cskwork/claude-codex/wiki/Understanding-the-Pipeline) - How the review process works
+- [How to Use](https://github.com/cskwork/claude-codex/wiki/How-to-Use) - Commands and usage examples
+- [Configuration](https://github.com/cskwork/claude-codex/wiki/Configuration) - Customization options
+- [Troubleshooting](https://github.com/cskwork/claude-codex/wiki/Troubleshooting) - Common issues and solutions
 
 ## Related Projects
 

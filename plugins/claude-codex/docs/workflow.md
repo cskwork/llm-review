@@ -15,10 +15,9 @@ Located in `skills/` (plugin root level):
 | Skill | Purpose | Model |
 |-------|---------|-------|
 | `review-sonnet` | Fast review (code + security + tests) | sonnet |
-| `review-opus` | Deep review (architecture + subtle bugs) | opus |
 | `review-codex` | Final review via Codex CLI | codex |
 
-> **Why sequential?** Each model reviews only ONCE per cycle, providing progressive refinement (fast → deep → final) without re-reviewing the same content.
+> **Why sequential?** Each model reviews only ONCE per cycle, providing progressive refinement (fast → final) without re-reviewing the same content.
 
 > **Context isolation**: Skills run with `context: fork` to isolate review feedback and preserve token efficiency.
 
@@ -53,8 +52,7 @@ plan_refining
      ↓ (main thread researches and refines)
      ↓ Sequential reviews:
      │   1. /review-sonnet → fix issues
-     │   2. /review-opus → fix issues
-     │   3. /review-codex → fix issues (restart from step 1 if needed)
+     │   2. /review-codex → fix issues (restart from step 1 if needed)
      ↓ [all approved]
 implementing
 ```
@@ -64,7 +62,6 @@ implementing
 2. Main thread → Researches codebase and refines plan with technical details
 3. **Sequential Reviews**:
    - `/review-sonnet` → Fast scan, if issues: fix, continue
-   - `/review-opus` → Deep analysis, if issues: fix, continue
    - `/review-codex` → Final review, if issues: fix, restart from sonnet
 
 ### Phase 2: Implementation
@@ -74,8 +71,7 @@ implementing
      ↓ (/implement-sonnet writes code)
      ↓ Sequential reviews:
      │   1. /review-sonnet → fix issues
-     │   2. /review-opus → fix issues
-     │   3. /review-codex → fix issues (restart from step 1 if needed)
+     │   2. /review-codex → fix issues (restart from step 1 if needed)
      ↓ [all approved]
 complete
 ```
@@ -84,7 +80,6 @@ complete
 1. **Invoke /implement-sonnet** → Writes code following standards
 2. **Sequential Reviews**:
    - `/review-sonnet` → Code quality + security + tests
-   - `/review-opus` → Architecture + subtle bugs + test quality
    - `/review-codex` → Final approval via Codex CLI
 
 ---
@@ -110,9 +105,7 @@ Output: .task/plan-refined.json
 After completion, run SEQUENTIAL reviews (each model reviews once):
   1. Invoke /review-sonnet → .task/review-sonnet.json
      If needs_changes: fix issues, then continue to step 2
-  2. Invoke /review-opus → .task/review-opus.json
-     If needs_changes: fix issues, then continue to step 3
-  3. Invoke /review-codex → .task/review-codex.json
+  2. Invoke /review-codex → .task/review-codex.json
      If needs_changes: fix issues, restart from step 1
      If approved: transition to implementing
 
@@ -155,12 +148,12 @@ idle
 plan_drafting (main thread creates plan)
   ↓
 plan_refining (main thread refines + sequential skill reviews)
-  │   sonnet → fix → opus → fix → codex
-  │          ↑__________________________|  (restart if codex finds issues)
+  │   sonnet → fix → codex
+  │          ↑____________|  (restart if codex finds issues)
   ↓ [all approved]
 implementing (/implement-sonnet + sequential skill reviews)
-  │   sonnet → fix → opus → fix → codex
-  │          ↑__________________________|  (restart if codex finds issues)
+  │   sonnet → fix → codex
+  │          ↑____________|  (restart if codex finds issues)
   ↓ [all approved]
 complete
 ```
@@ -171,8 +164,8 @@ complete
 |------|----|---------|
 | `idle` | `plan_drafting` | User sets state with user-request.txt |
 | `plan_drafting` | `plan_refining` | Main thread creates initial plan |
-| `plan_refining` | `implementing` | All reviewers approve (sonnet → opus → codex) |
-| `implementing` | `complete` | All reviewers approve (sonnet → opus → codex) |
+| `plan_refining` | `implementing` | All reviewers approve (sonnet → codex) |
+| `implementing` | `complete` | All reviewers approve (sonnet → codex) |
 | `*` | `error` | Failure after retries |
 | `*` | `needs_user_input` | Main thread needs clarification |
 
@@ -217,7 +210,6 @@ Each skill outputs to its own file:
 | File | Skill | Model |
 |------|-------|-------|
 | `.task/review-sonnet.json` | /review-sonnet | sonnet |
-| `.task/review-opus.json` | /review-opus | opus |
 | `.task/review-codex.json` | /review-codex | codex |
 
 Format:
@@ -283,7 +275,7 @@ Checks:
 - `state.json` valid (or will be created)
 - `pipeline.config.json` valid
 - Required scripts executable (4 scripts)
-- Required skills exist (3 review skills)
+- Required skills exist (2 review skills)
 - Required docs exist
 - `.task` in `.gitignore`
 - CLI tools available
