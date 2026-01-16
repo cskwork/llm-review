@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:\\\\Users\\\\a\\\\.claude\\\\plugins\\\\cache\\\\claude-codex\\\\claude-codex\\\\1.0.4/scripts/orchestrator.sh\" reset)",
+      "Skill(claude-codex:review-sonnet)",
+      "Skill(claude-codex:review-codex)",
+      "Skill(claude-codex:implement-sonnet)"
+    ]
+  }
+}

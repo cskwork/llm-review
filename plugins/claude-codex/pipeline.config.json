@@ -10,9 +10,9 @@
       "commit": true
     },
     "maxAutoRetries": 3,
-    "reviewLoopLimit": 10,
-    "planReviewLoopLimit": 10,
-    "codeReviewLoopLimit": 15
+    "reviewLoopLimit": 5,
+    "planReviewLoopLimit": 5,
+    "codeReviewLoopLimit": 7
   },
 
   "models": {
@@ -29,7 +29,7 @@
     "reviewer": {
       "provider": "openai",
       "model": "gpt-5.2-codex",
-      "reasoning": "high",
+      "reasoning": "medium",
       "temperature": 0.2
     }
   },
